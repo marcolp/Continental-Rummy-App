@@ -1,19 +1,32 @@
-using Unity.Engine;
-
+using UnityEngine;
+using System.Collections.Generic;
+using System;
 /** This is class of a deck of cards used in the game. */
 
-public class Deck : MonoBehaviour {
-	private ArrayList(Card) card;
+public class Deck : MonoBehaviour
+{
+	private List<Card> card;
 	
-	public Start() { }
+	private void Start()
+    {
+    }
+
+    private void Update()
+    {
+    }
 	
-	public Update() { }
-	
-	public void create() {
-		card = new ArrayList(Card);
-		for ( int i=0 ; i<52 ; i++ )
-			card.Add(new Card.init(i%13,i%4);
-		card.Add(new Card.init(14,-1));
-		card.Add(new Card.init(15,-1));
+	public void create()
+    {
+		card = new List<Card>();
+        foreach(Suit currentSuit in Enum.GetValues(typeof(Suit)))
+        {
+            foreach(Value currentValue in Enum.GetValues(typeof(Value)))
+            {
+                card.Add(new Card(currentValue, currentSuit));
+            }
+        }
+		
+		card.Add(new Card(Value.JOKER1,Suit.ALL));
+		card.Add(new Card(Value.JOKER2,Suit.ALL));
 	}
 }
