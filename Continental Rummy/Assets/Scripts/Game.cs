@@ -20,19 +20,22 @@ public class Game : MonoBehaviour {
 
     /** Adding a player to the game */
     public void addPlayer(string name) {
-        if ( player.Count>8 )
+        if ( player.Count>7 )
             Debug.Log(TAG + "Get a room!");
-        player.Add(new Player(name));
+        player.Add(new Player());
+        player[player.Count-1].name = name;
         adjustDecksInGame();
     }
 
     /** Do we need to add more decks to the game? */
-    public void adjustDecksInGame() {
+    private void adjustDecksInGame() {
         switch ( player.Count ) {
             case 1:
             case 2:
             case 3:
-
+                if ( deck.Count==1 )
+                    return;
+                deck.Add(new Deck());
                 break;
             case 4: //4 players use 2 decks
                 if ( deck.Count==2 )
@@ -55,5 +58,33 @@ public class Game : MonoBehaviour {
 
                 break;
         }
+    }
+
+    /** Starting the game */
+    public void start() {
+        //shuffle the decks in the game
+        CardOrderManipulation.shuffle(deck);
+        //deal each player 12 cards
+        dealToEachPlayer(12);
+    }
+
+    /** Deal the 'top' n cards of the deck. */
+    private void dealToEachPlayer(int n) {
+        Card c;
+        foreach ( Player p in player )
+            for ( int i=0 ; i<n ; i++ )
+                if ( (c=dealFromDeck())!=null )
+                    p.addToHand(c);
+                else
+                    Debug.Log(TAG + "idk fam we probs shoulda tested before mad-coding-seshes");
+    }
+
+    /** Deal from this deck of decks in the game. */
+    private Card dealFromDeck() {
+        if ( deck.Count>0 ) //if there are no decks to deal from, rip
+            return null;
+        if ( deck[deck.Count-1].isEmpty() ) //if the last deck is empty, remove it
+            deck.RemoveAt(deck.Count-1);
+        return deck[deck.Count-1].dealCard(); //return the 'top' card of the deck (last spot in the list)
     }
 }

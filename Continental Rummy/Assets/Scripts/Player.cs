@@ -18,4 +18,16 @@ public class Player : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    /** Deal this card to this player's hand */
+    public void addToHand(Card c) {
+        hand.Add(c);
+    }
+
+    /** Drop this card from this player's hand */
+    public void removeFromHand(Card card) {
+        for ( int i=0 ; i<hand.Count ; i++ )
+            if ( hand[i]==card )
+                hand.RemoveAt(i);
+    }
 }
