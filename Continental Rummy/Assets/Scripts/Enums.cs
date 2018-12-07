@@ -27,7 +27,7 @@ public enum Suit
     DIAMONDS,
     HEARTS,
     CLUBS,
-    ALL //For jokers
+    JOKER //For jokers
 }
 
 //todo use this for any reason, since this is for GUI?
