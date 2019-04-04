@@ -1,22 +1,27 @@
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 /** This is class for each instance of a Card (name and suit). */
 
+[CreateAssetMenu (fileName = "New Card", menuName = "Card/Spades")]
 public class Card : MonoBehaviour {
-	
 
-	private Value value;
-	private Suit suit;
+ 	public Value value;
+	public Suit suit;
 	private bool disposed; //has the card been played?
 	private bool inGame; //is the card in the game play?
+    private static System.Random randomV = new System.Random();
 
-	private void Start() { }
-	
-	private void Update() { }
+    private void Start() {
+    }
+
+    private void Update() { 
+    }
 	
 	/** Creates this instance of a Card to a name and suit (Constructor)*/
 	public Card(Value newValue, Suit newSuit) {
+
 	    value = newValue;
 		suit = newSuit;
 	}
@@ -27,8 +32,7 @@ public class Card : MonoBehaviour {
     /// </summary>
     public Card()
     {
-        Array values = Enum.GetValues(typeof(Value));
-        System.Random randomV = new System.Random();
+        Array values = Enum.GetValues(typeof(Value)); 
         Value randomValue = (Value)values.GetValue(randomV.Next(values.Length));
 
         value = randomValue;

@@ -17,16 +17,57 @@ public class HandValueCheck : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Counts the trios given the order of the hand.
+    /// </summary>
+    /// <returns>The trios.</returns>
+    /// <param name="hand">Hand.</param>
+    public int CountTrios(List<Card> hand)
+    {
+        int trioTotal = 0; //Total number of trio
+        int currentCardCount = 0; //how many cards with the current value have we seen
+        Value currentValue;
+        currentValue = hand[0].getValue();
+        foreach(Card x in hand)
+        {
+            if(currentValue != x.getValue())
+            {
+                currentValue = x.getValue();
+                currentCardCount = 0;
+            }
 
-     /// <summary>
-     /// Method to check if the set of cards is a run.
-     /// A run is at least four cards of the same suit
-     /// whose value is in ascending order. A run is 
-     /// made with 4 of more cards. Relies on the order
-     /// that the cards were received in.
-     /// </summary>
-     /// <returns><c>true</c>, if run was ised, <c>false</c> otherwise.</returns>
-     /// <param name="cardSet">Card set.</param>
+            else
+            {
+                currentCardCount++;
+                if(currentCardCount % 3 == 0)
+                {
+                    trioTotal++;
+                }
+            }
+        }
+
+        return trioTotal;
+    }
+
+    public int CountRuns(List<Card> hand)
+    {
+        int totalRuns = 0;
+
+
+
+        return totalRuns;
+    }
+
+
+    /// <summary>
+    /// Method to check if the set of cards is a run.
+    /// A run is at least four cards of the same suit
+    /// whose value is in ascending order. A run is 
+    /// made with 4 of more cards. Relies on the order
+    /// that the cards were received in.
+    /// </summary>
+    /// <returns><c>true</c>, if run was ised, <c>false</c> otherwise.</returns>
+    /// <param name="cardSet">Card set.</param>
     public bool IsRun(List<Card> cardSet)
     {
         if (cardSet.Count < 4) return false; //Not enough cards to be a run
@@ -60,7 +101,7 @@ public class HandValueCheck : MonoBehaviour {
                      * two more than THREE. This is to prevent something like:
                      * (TWO, THREE, JOKER, SIX) to be correct if we were to 
                      * just check that the joker is one less than the next.                    
-                    */                   
+                    */
                     Value previousCardValue = cardSet[i - 1].getValue();
                     if (previousCardValue + 2 == nextCardValue || nextCardValue == Value.JOKER1 || nextCardValue == Value.JOKER2)
                     {
@@ -90,7 +131,7 @@ public class HandValueCheck : MonoBehaviour {
                 {
                     return false;
                 }
-            } 
+            }
         }
 
         return true;
@@ -104,8 +145,6 @@ public class HandValueCheck : MonoBehaviour {
     /// <param name="cardSet">Card set.</param>
     public bool AreSameSuit(List<Card> cardSet)
     {
-
-
         Suit tempSuit = cardSet[0].getSuit();
 
         //Ceck that all cards have the same suit
@@ -116,14 +155,13 @@ public class HandValueCheck : MonoBehaviour {
                 continue;
             }
 
-
             //If any of the cards is a different suit 
             //then they are not the same suit
             else
                 return false;
         }
 
-        //If we compared all the cards that means they are the same!
+        //If we compared all the cards that means they are all the same suit!
         return true;
     }
 
