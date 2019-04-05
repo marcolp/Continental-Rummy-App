@@ -50,7 +50,7 @@ public class Testing : MonoBehaviour {
             tempCard.printCard();
         }
 
-        Debug.Log("Is this a run? "+handChecker.IsRun(newList));
+        Debug.Log("Is this a run? "+handChecker.isRun(newList));
         //CardOrderManipulation.sortCards(newList);
         //foreach(Card tempCard in newList)
         //{

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /**
@@ -14,119 +15,87 @@ public class HandValueCheck : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
+	}
 
-    }
-
-    /// <summary>
-    /// Counts the trios given the order of the hand.
-    /// </summary>
-    /// <returns>The trios.</returns>
-    /// <param name="hand">Hand.</param>
-    public int CountTrios(List<Card> hand)
-    {
-        int trioTotal = 0; //Total number of trio
-        int currentCardCount = 0; //how many cards with the current value have we seen
-        Value currentValue;
-        currentValue = hand[0].getValue();
-        foreach(Card x in hand)
-        {
-            if(currentValue != x.getValue())
-            {
-                currentValue = x.getValue();
-                currentCardCount = 0;
-            }
-
-            else
-            {
-                currentCardCount++;
-                if(currentCardCount % 3 == 0)
-                {
-                    trioTotal++;
-                }
-            }
-        }
-
-        return trioTotal;
-    }
-
-    public int CountRuns(List<Card> hand)
-    {
-        int totalRuns = 0;
-
-
-
-        return totalRuns;
-    }
-
-
-    /// <summary>
-    /// Method to check if the set of cards is a run.
-    /// A run is at least four cards of the same suit
-    /// whose value is in ascending order. A run is 
-    /// made with 4 of more cards. Relies on the order
-    /// that the cards were received in.
-    /// </summary>
-    /// <returns><c>true</c>, if run was ised, <c>false</c> otherwise.</returns>
-    /// <param name="cardSet">Card set.</param>
-    public bool IsRun(List<Card> cardSet)
+    /**
+     * Method to check if the set of cards is a run.
+     * A run is at least four cards of the same suit
+     * whose value is in ascending order. A run is 
+     * made with 4 of more cards.
+     */
+    public bool isRun(List<Card> cardSet)
     {
         if (cardSet.Count < 4) return false; //Not enough cards to be a run
 
-        if (!AreSameSuit(cardSet)) return false; //Cards have different suits
+        if (!areSameSuitL(cardSet)) return false; //Cards have different suits
 
-        //Traverse all cards except the last one
-        for(int i = 0; i < cardSet.Count-1; i++)
+        if ( inOrder(cardSet) )
+            return true;
+
+        return false;
+    }
+    private bool inOrder(List<Card> hand)
+    {
+        var orderedNoDup = hand.GroupBy(card => card.getValue()).Select(y => y.First());
+        var min = orderedNoDup.Min(card => card.getValue());
+        var max = orderedNoDup.Max(card => card.getValue());
+        var comp = Enumerable.Range((int)min, (int)max - (int)min + 1);
+        List<Card> ordered = orderedNoDup.ToList();
+        List<int> compL = comp.ToList();
+        for (int i = 0; i < ordered.Count; i++)
+            if ((int)ordered[i].getValue() != compL[i])
+                return false;
+        return true;
+    }
+    private bool areSameSuitL(List<Card> hand)
+    {
+        var clubs = from card in hand
+                    where card.getSuit() == Suit.CLUBS
+                    select card;
+        var spades = from card in hand
+                     where card.getSuit() == Suit.SPADES
+                     select card;
+        var diamonds = from card in hand
+                       where card.getSuit() == Suit.DIAMONDS
+                       select card;
+        var hearts = from card in hand
+                     where card.getSuit() == Suit.HEARTS
+                     select card;
+        return sameSize(clubs.ToList().Count, spades.ToList().Count, diamonds.ToList().Count, hearts.ToList().Count, hand.Count);
+    }
+    private bool sameSize(int a, int b, int c, int d, int comp)
+    {
+        return a == comp || b == comp || c == comp || d == comp;
+    }
+
+    /**
+     * Method to check if the set of cards are the same suit.
+     */
+    public bool areSameSuit(List<Card> cardSet)
+    {
+        Suit tempSuit = 0;
+        int counter = 0;
+
+        //Ceck that all cards have the same suit
+        foreach (Card currentCard in cardSet)
         {
-            Value currentCardValue = cardSet[i].getValue();
-            Value nextCardValue = cardSet[i+1].getValue();
-
-            //If the current card is a joker
-            if(currentCardValue == Value.JOKER1 || currentCardValue == Value.JOKER2)
+            //Take the first card and compare it to the rest
+            if (counter == 0)
             {
-                //If a joker is the first index, then the order of the next
-                //card is always correct
-                if(i == 0)
-                {
-                    continue;
-                }
-
-                //Joker isn't the first card
-                else
-                {
-                    /** 
-                     * Check that the next card is part of the run.
-                     * Make sure that the next card is 2 more than the
-                     * previous one. For example: (TWO, THREE, JOKER, FIVE)
-                     * when the joker is reached it will check that five is 
-                     * two more than THREE. This is to prevent something like:
-                     * (TWO, THREE, JOKER, SIX) to be correct if we were to 
-                     * just check that the joker is one less than the next.                    
-                    */
-                    Value previousCardValue = cardSet[i - 1].getValue();
-                    if (previousCardValue + 2 == nextCardValue || nextCardValue == Value.JOKER1 || nextCardValue == Value.JOKER2)
-                    {
-                        continue;
-                    }
-
-                    //Not a run
-                    else
-                    {
-                        return false;
-                    }
-                }
+                tempSuit = currentCard.getSuit();
+                continue;
             }
 
-            //Card is not a joker
             else
             {
-                //Check that the next card is one value greater than 
-                //the current card or that it's a joker.
-                if (currentCardValue + 1 == nextCardValue || nextCardValue == Value.JOKER1 || nextCardValue == Value.JOKER2)
+                
+                if (tempSuit == currentCard.getSuit())
                 {
                     continue;
                 }
 
-                //Not a run
+                //If any of the cards is a different suit then it is not a trio
                 else
                 {
                     return false;
@@ -134,69 +103,64 @@ public class HandValueCheck : MonoBehaviour {
             }
         }
 
+        //If we compared all the cards that means they are the same!
         return true;
     }
 
-
-    /// <summary>
-    /// Method to check if the set of cards are the same suit.
-    /// </summary>
-    /// <returns><c>true</c> if same suit <c>false</c> otherwise.</returns>
-    /// <param name="cardSet">Card set.</param>
-    public bool AreSameSuit(List<Card> cardSet)
+    /**
+     * Method to check if a set of cards is a trio.
+     * A trio is made with at least 3 cards.
+     * NOTE that despite it being called a trio, there could
+     * be more than three. As long as all have the same value
+     * it is considered a trio
+     */
+    public bool isTrio(List<Card> cardSet)
     {
-        Suit tempSuit = cardSet[0].getSuit();
+        if (cardSet.Count < 3) return false; //Not enough cards to be a tio
 
-        //Ceck that all cards have the same suit
-        foreach (Card currentCard in cardSet)
-        {
-            if (tempSuit == currentCard.getSuit() || Suit.JOKER == currentCard.getSuit())
-            {
-                continue;
-            }
-
-            //If any of the cards is a different suit 
-            //then they are not the same suit
-            else
-                return false;
-        }
-
-        //If we compared all the cards that means they are all the same suit!
-        return true;
-    }
-
-
-
-    /// <summary>
-    /// Method to check if a set of cards is a trio.
-    /// A trio is made with at least 3 cards.
-    /// NOTE that despite it being called a trio, there could
-    /// be more than three. As long as all have the same value
-    /// it is considered a trio
-    /// </summary>
-    /// <returns><c>true</c> if trio <c>false</c> otherwise.</returns>
-    /// <param name="cardSet">Card set.</param>
-    public bool IsTrio(List<Card> cardSet)
-    {
-        if (cardSet.Count < 3) return false; //Not enough cards to be a trio
-
-        Value tempValue = cardSet[0].getValue();
+        Value tempValue = 0;
+        int counter = 0;
 
         foreach(Card currentCard in cardSet)
         {
-            if(tempValue == currentCard.getValue() || Value.JOKER1 == currentCard.getValue() || Value.JOKER2 == currentCard.getValue())
+            //Take the first card and compare it to the rest
+            if (counter == 0)
             {
+                tempValue = currentCard.getValue();
                 continue;
             }
 
-            //If any of the cards is a different value then it is not a trio
             else
             {
-                return false;
+               
+                if(tempValue == currentCard.getValue())
+                {
+                    continue;
+                }
+
+                //If any of the cards is a different value then it is not a trio
+                else
+                {
+                    return false;
+                }
             }
         }
 
         //If we compared all the cards that means they are the same!
+        return true;
+    }
+
+    public bool isTrioL(List<Card> hand)
+    {
+        var ordered = from card in hand
+                      group card by (int)card.getValue() into list
+                      let count = list.Count()
+                      orderby count descending
+                      select new { cValue = list.Key, cCount = count };
+
+        foreach ( var c in ordered )
+            if ( c.cCount<=3 )
+                return false;
         return true;
     }
 }
