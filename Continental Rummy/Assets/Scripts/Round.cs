@@ -8,8 +8,6 @@ public class Round : MonoBehaviour {
     private List<Player> player;
     private int ROUND; //the current round of the game
 	private int MAX; //the maximum number of rounds for each game
-	private HandValueCheck check;
-	private bool running; //is the round currently started and running?
 	private int triosNeeded;
 	private int runsNeeded;
 
@@ -19,11 +17,18 @@ public class Round : MonoBehaviour {
 	void Start () {
 		ROUND = 0;
 		MAX = 7;
-		running = false;
 	}
 	
 	// Update is called once per frame
-	void Update () { }
+	void Update () {
+        run();
+        //Debug.Log(TAG + " In round " + getRound());
+        foreach ( Player x in player )
+        {
+            if ( x.hand.Count==0 )
+                endRound(x);
+        }
+    }
 
     /** Necessary? bc players' hands update per turn */
     public void setPlayers(List<Player> p) {
@@ -32,9 +37,10 @@ public class Round : MonoBehaviour {
 
     /** Game Manager sets the round of the game in play. */
     public void run() {
-		ROUND++; //round starts at 0
-		running = true;
         switch ( ROUND ) {
+            case 0:
+                ROUND++; //round starts at 0
+                break;
             case 1:
 				triosNeeded=2;
 				runsNeeded=0;
@@ -64,10 +70,9 @@ public class Round : MonoBehaviour {
 				runsNeeded=3;
                 break;
             default:
-                Debug.Log(TAG + "y u do dis?");
+                Debug.Log(TAG + " y u do dis?");
                 break;
         }
-		triosAndStraights(triosNeeded,runsNeeded);
     }
 	
 	/** In what round is the game currently playing?
@@ -79,7 +84,7 @@ public class Round : MonoBehaviour {
 	/** Has this round completed its play?
 	  * @returns true if this round has its winning conditions met, false otherwise */
 	public bool isDone() {
-		return running;
+        return ( getRound()>0 && getRound()<=MAX );
 	}
 	
 	/** What is the maxmimum number of rounds to play?
@@ -87,36 +92,22 @@ public class Round : MonoBehaviour {
 	public int getLastRound() {
 		return MAX;
 	}
-	
-	/** Each round has a specific amount of cards required to begin.
-	  * @returns the number of cards (as an integer) required to start the current round */
-	public int cardsNeededToOpen() {
-        switch ( ROUND ) {
-            case 1:
-                return 6;
-            case 2:
-				return 7;
-            case 3:
-                return 8;
-            case 4:
-                return 9;
-            case 5:
-                return 10;
-            case 6:
-                return 11;
-            case 7:
-                return 12;
-            default:
-                Debug.Log(TAG + "*thronking*");
-                return -1;
-        }
-	}
 
     /** Each round requires t trios and s straights to complete. */
     public void triosAndStraights(int t, int r) {
 		if ( t==triosNeeded && r==runsNeeded ) {
-			running = false;
-            Debug.Log("have trios=" +t+ ", runs=" + r + ", to complete round=" +ROUND);
+			Debug.Log(TAG + " Have trios=" + t+ ", runs=" + r + ", to complete round=" + getRound());
+            
+        }
+    }
+
+    public void endRound(Player p)
+    {
+        Debug.Log(TAG + " Player " + p.name + " has won round " + getRound());
+        ROUND++;
+        HandValueCheck hvc = new HandValueCheck();
+        foreach ( Player l in player ) {
+            l.updateScore(hvc.getScore(l.hand));
         }
     }
 }

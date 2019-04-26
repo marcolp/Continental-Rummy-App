@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
-    public string name;
+    public string pname;
     public int score;
     public List<Card> hand;
     public bool opened; //Whether or not the player has opened their hand ("gone down") 
@@ -29,5 +29,10 @@ public class Player : MonoBehaviour {
         for ( int i=0 ; i<hand.Count ; i++ )
             if ( hand[i]==card )
                 hand.RemoveAt(i);
+    }
+
+    public void updateScore(int s)
+    {
+        score += s;
     }
 }

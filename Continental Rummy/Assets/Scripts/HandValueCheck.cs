@@ -6,17 +6,46 @@ using UnityEngine;
 /**
  * Class to detect the value of a set of cards
  */
-public class HandValueCheck : MonoBehaviour {
+public class HandValueCheck : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    //5 points for cards from 2–9
+    //10 and face cards count as 10 points
+    //aces are 20 points
+    //jokers are 50
+    public int getScore(List<Card> hand)
+    {
+        int score = 0;
+        foreach ( Card c in hand )
+        {
+            switch ( c.value )
+            {
+                case Value.ACE:
+                    score += 20;
+                    break;
+                case Value.TWO:
+                case Value.THREE:
+                case Value.FOUR:
+                case Value.FIVE:
+                case Value.SIX:
+                case Value.SEVEN:
+                case Value.EIGHT:
+                case Value.NINE:
+                    score += 5;
+                    break;
+                case Value.TEN:
+                case Value.JACK:
+                case Value.QUEEN:
+                case Value.KING:
+                    score += 10;
+                    break;
+                default:
+                    score += 50;
+                    break;
+            }
+        }
+        return score;
+    }
 
     /**
      * Method to check if the set of cards is a run.
